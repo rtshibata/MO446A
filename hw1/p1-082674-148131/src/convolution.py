@@ -63,7 +63,7 @@ print("A 3x3 mask took %s seconds in our convolution function" % round(time.time
 cv2.imwrite('../output/output-p1-2-1-0.png', img_conv)
 start_time = time.time()
 img_conv_opencv = cv2.filter2D(img, -1, msk)
-print("A 3x3 mask took %s seconds in OpenCV filer" % round(time.time()-start_time, 4))
+print("A 3x3 mask took %s seconds in OpenCV filter" % round(time.time()-start_time, 4))
 #cv2.imwrite('../output/opencv0.png', img_conv_opencv)
 
 
@@ -75,7 +75,7 @@ print("A 7x7 mask took %s seconds in our convolution function" % round(time.time
 cv2.imwrite('../output/output-p1-2-1-1.png', img_conv)
 start_time = time.time()
 img_conv_opencv = cv2.filter2D(img, -1, msk)
-print("A 7x7 mask took %s seconds in OpenCV filer" % round(time.time()-start_time, 4))
+print("A 7x7 mask took %s seconds in OpenCV filter" % round(time.time()-start_time, 4))
 #cv2.imwrite('../output/opencv1.png', img_conv_opencv)
 
 
@@ -87,7 +87,7 @@ print("A 15x15 mask took %s seconds in our convolution function" % round(time.ti
 cv2.imwrite('../output/output-p1-2-1-2.png', img_conv)
 start_time = time.time()
 img_conv_opencv = cv2.filter2D(img, -1, msk)
-print("A 15x15 mask took %s seconds in OpenCV filer" % round(time.time()-start_time, 4))
+print("A 15x15 mask took %s seconds in OpenCV filter" % round(time.time()-start_time, 4))
 #cv2.imwrite('../output/opencv2.png', img_conv_opencv)
 
 #Kernel 50x50 box blur
@@ -98,7 +98,7 @@ print("A 50x50 mask took %s seconds in our convolution function" % round(time.ti
 cv2.imwrite('../output/output-p1-2-1-3.png', img_conv)
 start_time = time.time()
 img_conv_opencv = cv2.filter2D(img, -1, msk)
-print("A 50x50 mask took %s seconds in OpenCV filer" % round(time.time()-start_time, 4))
+print("A 50x50 mask took %s seconds in OpenCV filter" % round(time.time()-start_time, 4))
 #cv2.imwrite('../output/opencv3.png', img_conv_opencv)
 
 
