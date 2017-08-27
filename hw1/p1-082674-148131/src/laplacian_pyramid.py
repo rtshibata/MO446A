@@ -3,11 +3,13 @@ import convolution as conv
 import numpy as np
 
 class LPyramid:
-	images = []
 
+	def heigh(self):
+		return len(self.images)
+	
 	# Returns the sum of the laplacian image i with the gaussian image i+1 upsampled.
 	def down(self, image, level):
-		return self.images[level] + gp.GPyramid.down(image)
+		return self.images[level] + gp.GPyramid.down(image, self.images[level].shape)
 
 	# Appends the gaussian image i+1 to the pyramid
 	# generates the laplacian image i
@@ -17,7 +19,7 @@ class LPyramid:
 		gaussian_this = self.images[level-1]
 		gaussian_up = gp.GPyramid.up(gaussian_this)
 		self.images.append(gaussian_up)
-		self.images[level-1] = gaussian_this - gp.GPyramid.down(gaussian_up)
+		self.images[level-1] = gaussian_this - gp.GPyramid.down(gaussian_up, gaussian_this.shape)
 		return self.images[level]
 
 	# Returns the gaussian image at the requested level.
@@ -39,8 +41,11 @@ class LPyramid:
 			return output
 
 	# Generates a pyramid of the image with the inputed level.
-	def __init__(self, image, levels):
-		self.images.append(image)
-		for i in range(levels-1):
-			self.up()
+	def __init__(self, image=None, levels=None):
+		self.images = []
+		if(image is not None):
+			self.images.append(image)
+			if (levels is not None):
+				for i in range(levels-1):
+					self.up()
 

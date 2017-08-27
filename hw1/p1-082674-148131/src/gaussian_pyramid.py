@@ -2,10 +2,11 @@ import convolution as conv
 import numpy as np
 
 class GPyramid:
-	images = []
+	def heigh(self):
+		return len(self.images)
 
 	@staticmethod
-	def down(image):
+	def down(image, expected_shape=None):
 		# Desce um nivel na piramide
 		# Duplica linhas e colunas
 		image_down = np.repeat(image, 2, axis=0)
@@ -13,6 +14,19 @@ class GPyramid:
 
 		# Interpolar
 		# Pode utilizar uma fucao de biblioteca nesse caso(prof. confimou no moodle)
+
+		# Fix the shape in case the lower image was odd
+		if expected_shape is not None:
+			if image_down.shape[0] > expected_shape[0]:
+				image_down = np.delete(image_down, image_down.shape[0]-1, axis=0)
+				if image_down.shape[0] != expected_shape[0]:
+					print("Wrong shape in the axis=0. Expected shape:", expected_shape[0], "Shape given:", image_down.shape[0])
+					return None
+			if image_down.shape[1] > expected_shape[1]:
+				image_down = np.delete(image_down, image_down.shape[1]-1, axis=1)
+				if image_down.shape[1] != expected_shape[1]:
+					print("Wrong shape in the axis=1. Expected shape:", expected_shape[1], "Shape given:", image_down.shape[1])
+					return None
 
 		return image_down
 	@staticmethod
@@ -38,12 +52,13 @@ class GPyramid:
 		if (len(self.images) > level):
 			return self.images[level]
 		else:
-			for i in range(len(self.images)-1, level+1):
+			for i in range(len(self.images)-1, level-1):
 				self.images.append(self.up(self.images[i]))
 			return self.images[level]
 
 	def __init__(self, image, levels):
+		self.images = []
 		self.images.append(image)
-		for i in range(levels):
+		for i in range(levels-1):
 			self.images.append(self.up(self.images[i]))
 
