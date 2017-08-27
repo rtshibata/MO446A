@@ -1,12 +1,11 @@
 import convolution as conv
-import cv2
 import numpy as np
-import sys
 
 class GPyramid:
 	images = []
 
-	def down(self, image):
+	@staticmethod
+	def down(image):
 		# Desce um nivel na piramide
 		# Duplica linhas e colunas
 		image_down = np.repeat(image, 2, axis=0)
@@ -16,8 +15,8 @@ class GPyramid:
 		# Pode utilizar uma fucao de biblioteca nesse caso(prof. confimou no moodle)
 
 		return image_down
-
-	def up(self, image):
+	@staticmethod
+	def up(image):
 		# Gaussian mask, eu escolhi essa mascara só para testar a piramide, 
 		# mas sera necessario testar varias masks 
 		# ou encontrar uma mask que conseguimos explicar pq é a melhor.
@@ -39,7 +38,7 @@ class GPyramid:
 		if (len(self.images) > level):
 			return self.images[level]
 		else:
-			for i in range(len(self.images)-1, level):
+			for i in range(len(self.images)-1, level+1):
 				self.images.append(self.up(self.images[i]))
 			return self.images[level]
 
@@ -47,16 +46,4 @@ class GPyramid:
 		self.images.append(image)
 		for i in range(levels):
 			self.images.append(self.up(self.images[i]))
-
-img = cv2.imread('../input/input-p1-2-2-0.jpg', 1)
-if img is None:
-	print("Image not found.")
-	sys.exit()
-G = GPyramid(img, 2)
-#Down-scaling(Subindo na piramide)
-cv2.imwrite('../output/output-p1-2-2-0.png', G.access(1))
-cv2.imwrite('../output/output-p1-2-2-1.png', G.access(2))
-#Upscaling(DEscendo na piramide)
-cv2.imwrite('../output/output-p1-2-2-3.png', G.down(G.images[1]))
-cv2.imwrite('../output/output-p1-2-2-4.png', G.down(G.images[2]))
 

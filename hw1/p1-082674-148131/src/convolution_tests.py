@@ -2,9 +2,13 @@ import convolution as conv
 import numpy as np
 import cv2
 import time
+import sys
+
 
 img = cv2.imread('../input/input-p1-2-1-0.png', 1)
-
+if img is None:
+	print("Image not found.")
+	sys.exit()
 #Kernel 3x3 edge detection
 msk = np.array([[-1, -1, -1], [-1, 8, -1], [-1, -1, -1]])
 start_time = time.time()
