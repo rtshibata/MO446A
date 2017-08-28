@@ -4,7 +4,7 @@ import numpy as np
 
 class LPyramid:
 
-	def heigh(self):
+	def height(self):
 		return len(self.images)
 	
 	# Returns the sum of the laplacian image i with the gaussian image i+1 upsampled.

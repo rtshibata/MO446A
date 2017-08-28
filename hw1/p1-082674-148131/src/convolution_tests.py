@@ -55,16 +55,14 @@ img_conv_opencv = cv2.filter2D(img, -1, msk)
 print("A 50x50 mask took %s seconds in OpenCV filter" % round(time.time()-start_time, 4))
 #cv2.imwrite('../output/opencv3.png', img_conv_opencv)
 
+msk = np.array([[-1, 0, 1]])
+start_time = time.time()
+img_conv = conv.convolution (img, msk)
+print("A 1x3 mask took %s seconds in our convolution function" % round(time.time()-start_time, 4))
+cv2.imwrite('../output/output-p1-2-1-4.png', img_conv)
+start_time = time.time()
+img_conv_opencv = cv2.filter2D(img, -1, msk)
+print("A 1x3 mask took %s seconds in OpenCV filter" % round(time.time()-start_time, 4))
 
-#Testes com kernels de formas diferentes, nao é necesario para o programa final
-#msk = np.array([[-0.5, 0, 0.5]])
-#img_conv = conv.convolution (img, msk)
-#cv2.imwrite('../output/output-p1-2-1-teste-0.png', img_conv)
 
-#msk = np.array([[0.6]])
-#img_conv = conv.convolution (img, msk)
-#cv2.imwrite('../output/output-p1-2-1-teste-01.png', img_conv)
 
-#msk = np.array([[-1, -1, -1], [-1, 5, -1]])
-#img_conv = conv.convolution (img, msk)
-#cv2.imwrite('../output/output-p1-2-1--teste-02.png', img_conv)

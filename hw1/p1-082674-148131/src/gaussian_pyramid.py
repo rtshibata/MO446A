@@ -2,7 +2,7 @@ import convolution as conv
 import numpy as np
 
 class GPyramid:
-	def heigh(self):
+	def height(self):
 		return len(self.images)
 
 	@staticmethod
@@ -12,8 +12,9 @@ class GPyramid:
 		image_down = np.repeat(image, 2, axis=0)
 		image_down = np.repeat(image_down, 2, axis=1)
 
-		# Interpolar
-		# Pode utilizar uma fucao de biblioteca nesse caso(prof. confimou no moodle)
+		#Interpolation with a 3x3 box blur kernel.
+		msk = np.full((3,3), 1/(3*3))
+		image_down = conv.convolution (image_down, msk)
 
 		# Fix the shape in case the lower image was odd
 		if expected_shape is not None:
@@ -31,14 +32,12 @@ class GPyramid:
 		return image_down
 	@staticmethod
 	def up(image):
-		# Gaussian mask, eu escolhi essa mascara só para testar a piramide, 
-		# mas sera necessario testar varias masks 
-		# ou encontrar uma mask que conseguimos explicar pq é a melhor.
-		msk = np.array([[1, 4, 7, 4, 1],
-						[4,16,26,16, 4],
-						[7,26,41,26, 7],
-						[4,16,26,16, 4],
-						[1, 4, 7, 4, 1]])*1/273
+		msk = np.array([[1, 4, 6, 4, 1],
+						[4,16,24,16, 4],
+						[6,24,36,24, 6],
+						[4,16,24,16, 4],
+						[1, 4, 6, 4, 1]])
+		msk = msk/np.sum(msk)
 		# Blur
 		image_up = conv.convolution(image, msk)
 		# Remove linhas e colunas pares
@@ -52,7 +51,7 @@ class GPyramid:
 		if (len(self.images) > level):
 			return self.images[level]
 		else:
-			for i in range(len(self.images)-1, level-1):
+			for i in range(len(self.images)-1, level+1):
 				self.images.append(self.up(self.images[i]))
 			return self.images[level]
 
