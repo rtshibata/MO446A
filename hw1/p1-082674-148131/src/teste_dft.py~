@@ -76,7 +76,7 @@ imgleft = cv2.imread(#dir_path+
 if imgleft is None:
 	print("Image 1 not found.")
 	sys.exit()
-# C.Ronaldo
+# Ronaldo
 imgright = cv2.imread(#dir_path+
 '../input/input-p1-3-2-1.jpg', 0)
 if imgright is None:
@@ -88,15 +88,8 @@ if imgleft.shape != imgright.shape:
 
 height, length = imgleft.shape[0], imgleft.shape[1]
 blend_mask = np.ones((height, length//2))
-blend_mask = np.concatenate((blend_mask, np.zeros((height, length-length//2, 1))), axis=1)
+blend_mask = np.concatenate((blend_mask, np.zeros((height, length-length//2))), axis=1)
 
-imgleft = np.multiply(imgleft, blend_mask)
-imgright = np.multiply(imgright, 1 - blend_mask)
-
-dft_l = cv2.dft(np.float32(imgleft),flags = cv2.DFT_COMPLEX_OUTPUT)
-dft_shift_l = np.fft.fftshift(dft_l)
-dft_r = cv2.dft(np.float32(imgright),flags = cv2.DFT_COMPLEX_OUTPUT)
-dft_shift_r = np.fft.fftshift(dft_r)
 
 fourier_result = fourier.blend(dft_shift_l, dft_shift_r, blend_mask)
 cv2.imwrite('../output/output-p1-3-2-0.png', fourier_result[0])

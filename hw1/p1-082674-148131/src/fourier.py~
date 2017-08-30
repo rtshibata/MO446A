@@ -2,10 +2,16 @@ import numpy as np
 import cv2
 from matplotlib import pyplot as plt
 
-def blend(dft_shift_1, dft_shift_2, mask):
+def blend(imgleft, imgright, mask):
 
-	img1 = np.multiply(img1, mask)
-	img2 = np.multiply(img2, 1 - mask)
+	imgleft = np.multiply(imgleft, mask)
+	imgright = np.multiply(imgright, 1 - mask)
+
+	dft_l = cv2.dft(np.float32(imgleft),flags = cv2.DFT_COMPLEX_OUTPUT)
+	dft_shift_l = np.fft.fftshift(dft_l)
+	dft_r = cv2.dft(np.float32(imgright),flags = cv2.DFT_COMPLEX_OUTPUT)
+	dft_shift_r = np.fft.fftshift(dft_r)
+
 #	img1 = img1 * (mask/255)
 #	img2 = img2 * (1 - mask/255)
 
@@ -14,12 +20,12 @@ def blend(dft_shift_1, dft_shift_2, mask):
 #	dft_shift_1 = np.fft.fftshift(dft_1)
 #	dft_shift_2 = np.fft.fftshift(dft_2)
 	
-	magnitude_spectrum_1 = 20*np.log(cv2.magnitude(dft_shift_1[:,:,0],dft_shift_1[:,:,1]))
+	magnitude_spectrum_1 = 20*np.log(cv2.magnitude(dft_shift_l[:,:,0],dft_shift_l[:,:,1]))
 	#magnitude_spectrum = cv2.magnitude(dft_shift[:,:,0],dft_shift[:,:,1])
-	phase_spectrum_1 = 40*np.log(cv2.phase(dft_shift_1[:, :, 0], dft_shift_1[:, :, 1], True))
-	magnitude_spectrum_2 = 20*np.log(cv2.magnitude(dft_shift_2[:,:,0],dft_shift_2[:,:,1]))
+	phase_spectrum_1 = 40*np.log(cv2.phase(dft_shift_l[:, :, 0], dft_shift_l[:, :, 1], True))
+	magnitude_spectrum_2 = 20*np.log(cv2.magnitude(dft_shift_r[:,:,0],dft_shift_r[:,:,1]))
 	#magnitude_spectrum = cv2.magnitude(dft_shift[:,:,0],dft_shift[:,:,1])
-	phase_spectrum_2 = 40*np.log(cv2.phase(dft_shift_2[:, :, 0], dft_shift_2[:, :, 1], True))
+	phase_spectrum_2 = 40*np.log(cv2.phase(dft_shift_r[:, :, 0], dft_shift_r[:, :, 1], True))
 
 #	img1_freq = magnitude_spectrum_1 * np.exp(1j*phase_spectrum_1)
 #	img2_freq = magnitude_spectrum_2 * np.exp(1j*phase_spectrum_2)
@@ -32,10 +38,10 @@ def blend(dft_shift_1, dft_shift_2, mask):
 	#result,_ = idft_output_max(img_blend,100)
 	f_ishift = np.fft.ifftshift(mag_)
 	img_back = cv2.idft(f_ishift, flags=cv2.DFT_SCALE)
-	f_ishift = np.fft.ifftshift(pha_)
-	img_back2 = cv2.idft(f_ishift, flags=cv2.DFT_SCALE)
-	magnitude_spectrum = (cv2.magnitude(img_back[:,:,0],img_back[:,:,1]))
-	phase_spectrum = (cv2.phase(img_back2[:, :, 0], img_back2[:, :, 1], True))
+	f_ishift2 = np.fft.ifftshift(pha_)
+	img_back2 = cv2.idft(f_ishift2, flags=cv2.DFT_SCALE)
+	magnitude_spectrum = cv2.magnitude(img_back[:,:,0],img_back[:,:,1])
+	phase_spectrum = cv2.phase(img_back2[:, :, 0], img_back2[:, :, 1], True)
 	return phase_spectrum, magnitude_spectrum
 
 
