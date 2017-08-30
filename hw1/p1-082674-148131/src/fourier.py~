@@ -2,12 +2,47 @@ import numpy as np
 import cv2
 from matplotlib import pyplot as plt
 
+def blend(dft_shift_1, dft_shift_2, mask):
+
+	img1 = np.multiply(img1, mask)
+	img2 = np.multiply(img2, 1 - mask)
+#	img1 = img1 * (mask/255)
+#	img2 = img2 * (1 - mask/255)
+
+#	dft_1 = cv2.dft(np.float32(img1),flags = cv2.DFT_COMPLEX_OUTPUT)
+#	dft_2 = cv2.dft(np.float32(img2),flags = cv2.DFT_COMPLEX_OUTPUT)
+#	dft_shift_1 = np.fft.fftshift(dft_1)
+#	dft_shift_2 = np.fft.fftshift(dft_2)
+	
+	magnitude_spectrum_1 = 20*np.log(cv2.magnitude(dft_shift_1[:,:,0],dft_shift_1[:,:,1]))
+	#magnitude_spectrum = cv2.magnitude(dft_shift[:,:,0],dft_shift[:,:,1])
+	phase_spectrum_1 = 40*np.log(cv2.phase(dft_shift_1[:, :, 0], dft_shift_1[:, :, 1], True))
+	magnitude_spectrum_2 = 20*np.log(cv2.magnitude(dft_shift_2[:,:,0],dft_shift_2[:,:,1]))
+	#magnitude_spectrum = cv2.magnitude(dft_shift[:,:,0],dft_shift[:,:,1])
+	phase_spectrum_2 = 40*np.log(cv2.phase(dft_shift_2[:, :, 0], dft_shift_2[:, :, 1], True))
+
+#	img1_freq = magnitude_spectrum_1 * np.exp(1j*phase_spectrum_1)
+#	img2_freq = magnitude_spectrum_2 * np.exp(1j*phase_spectrum_2)
+#	img_blend = img1_freq + img2_freq
+
+	mag_ = magnitude_spectrum_1 + magnitude_spectrum_2
+	pha_ = phase_spectrum_1 + phase_spectrum_2
+
+	#100% of pixels are utilized for idft
+	#result,_ = idft_output_max(img_blend,100)
+	f_ishift = np.fft.ifftshift(mag_)
+	img_back = cv2.idft(f_ishift, flags=cv2.DFT_SCALE)
+	f_ishift = np.fft.ifftshift(pha_)
+	img_back2 = cv2.idft(f_ishift, flags=cv2.DFT_SCALE)
+	magnitude_spectrum = (cv2.magnitude(img_back[:,:,0],img_back[:,:,1]))
+	phase_spectrum = (cv2.phase(img_back2[:, :, 0], img_back2[:, :, 1], True))
+	return phase_spectrum, magnitude_spectrum
+
+
 def equalize_rest_0(m,val):
 	"""
 	fill every element greater than val as 0
 	"""
-	# matriz[i][j] = 0, if m[i][j] > minval; 
-	# matriz[i][j] = m[i][j], else.
 	matrix = np.where(m > val, 0, m)
 	return matrix
 
@@ -15,8 +50,6 @@ def equalize_rest_0_bigger(m,val):
 	"""
 	fill every element smaller than val as 0
 	"""
-	# matriz[i][j] = 0, if m[i][j] > minval; 
-	# matriz[i][j] = m[i][j], else.
 	matrix = np.where(m < val, 0, m)
 	return matrix
 
@@ -50,7 +83,7 @@ def spectrum_biggest_values(dft,percentage=None):
 		print maxval		
 	
 	#makes every other point become equal to 0
-	result = equalize_rest_0(dft,maxval)	
+	result = equalize_rest_0_bigger(dft,maxval)	
 	#dft[dft > minval] = 0
 	
 	return result
@@ -99,68 +132,5 @@ def idft_output_max(dft_shift,percentage=None):
 	phase_spectrum = (cv2.phase(img_back[:, :, 0], img_back[:, :, 1], True))
 
 	return phase_spectrum, magnitude_spectrum
-
-img = cv2.imread('../input/input-p1-3-1-0.jpg',0)
-dft = cv2.dft(np.float32(img),flags = cv2.DFT_COMPLEX_OUTPUT)
-dft_shift = np.fft.fftshift(dft)
-
-magnitude_spectrum = 20*np.log(cv2.magnitude(dft_shift[:,:,0],dft_shift[:,:,1]))
-#magnitude_spectrum = cv2.magnitude(dft_shift[:,:,0],dft_shift[:,:,1])
-phase_spectrum = 40*np.log(cv2.phase(dft_shift[:, :, 0], dft_shift[:, :, 1], True))
-#phase_spectrum = cv2.phase(dft_shift[:, :, 0], dft_shift[:, :, 1], True)
-
-#obtains magnitude and phase spectrum
-cv2.imwrite('../output/output-p1-3-1-0.png', magnitude_spectrum)
-cv2.imwrite('../output/output-p1-3-1-1.png', phase_spectrum)
-
-#takes only 1 point, the lowest value
-spectrums = idft_output_min(dft_shift)
-cv2.imwrite('../output/output-p1-3-1-2.png', spectrums[0])
-cv2.imwrite('../output/output-p1-3-1-7.png', spectrums[1])
-
-#takes 25% of the lowest values
-spectrums = idft_output_min(dft_shift,25)
-cv2.imwrite('../output/output-p1-3-1-3.png', spectrums[0])
-cv2.imwrite('../output/output-p1-3-1-8.png', spectrums[1])
-
-#takes 50% of the lowest values
-spectrums = idft_output_min(dft_shift,50)
-cv2.imwrite('../output/output-p1-3-1-4.png', spectrums[0])
-cv2.imwrite('../output/output-p1-3-1-9.png', spectrums[1])
-
-#takes 75% of the lowest values
-spectrums = idft_output_min(dft_shift,75)
-cv2.imwrite('../output/output-p1-3-1-5.png', spectrums[0])
-cv2.imwrite('../output/output-p1-3-1-10.png', spectrums[1])
-
-#takes 100% of the lowest values
-spectrums = idft_output_min(dft_shift,100)
-cv2.imwrite('../output/output-p1-3-1-6.png', spectrums[0])
-cv2.imwrite('../output/output-p1-3-1-11.png', spectrums[1])
-
-#takes only 1 point, the highest value
-spectrums = idft_output_max(dft_shift)
-cv2.imwrite('../output/output-p1-3-1-12.png', spectrums[0])
-cv2.imwrite('../output/output-p1-3-1-17.png', spectrums[1])
-
-#takes 25% of the highest values
-spectrums = idft_output_max(dft_shift,25)
-cv2.imwrite('../output/output-p1-3-1-13.png', spectrums[0])
-cv2.imwrite('../output/output-p1-3-1-18.png', spectrums[1])
-
-#takes 50% of the highst values
-spectrums = idft_output_max(dft_shift,50)
-cv2.imwrite('../output/output-p1-3-1-14.png', spectrums[0])
-cv2.imwrite('../output/output-p1-3-1-19.png', spectrums[1])
-
-#takes 75% of the highest values
-spectrums = idft_output_max(dft_shift,75)
-cv2.imwrite('../output/output-p1-3-1-15.png', spectrums[0])
-cv2.imwrite('../output/output-p1-3-1-20.png', spectrums[1])
-
-#takes 100% of the highest values
-spectrums = idft_output_max(dft_shift,100)
-cv2.imwrite('../output/output-p1-3-1-16.png', spectrums[0])
-cv2.imwrite('../output/output-p1-3-1-21.png', spectrums[1])
 
 
