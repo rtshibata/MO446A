@@ -4,7 +4,9 @@ from matplotlib import pyplot as plt
 
 
 def equalize_rest_0(m,minval):
-
+	"""
+	fill every element greater than minval as 0
+	"""
 	matrix = m[:,:,:]
 	for i in range(matrix.shape[0]): 	
 		for j in range(matrix.shape[1]):
