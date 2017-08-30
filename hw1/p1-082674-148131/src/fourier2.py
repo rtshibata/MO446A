@@ -2,11 +2,17 @@ import numpy as np
 import cv2
 from matplotlib import pyplot as plt
 
-#fill every element greater than minval as 0
+
 def equalize_rest_0(m,minval):
-	# matriz[i][j] = 0, if m[i][j] > minval; 
-	# matriz[i][j] = m[i][j], else.
-	matrix = np.where(m > minval, 0, m)
+	"""
+	fill every element greater than minval as 0
+	"""
+	matrix = m[:,:,:]
+	for i in range(matrix.shape[0]): 	
+		for j in range(matrix.shape[1]):
+			matrix[ matrix > minval] = 0
+	#for i in matrix: 	
+	#	print i
 	return matrix
 
 def find_nth_biggest(a, n):
@@ -26,17 +32,20 @@ def spectrum_lowest_values(dft,percentage=None):
 	"""
 	#no_zeros_array = np.trim_zeros(spectrum.flatten())
 	array = dft.flatten()
-	
-	if percentage is None:
+	minval = np.min(dft[np.nonzero(dft)])
+	print minval
+#	if percentage is None:
 		#get the lowest value which is different of 0 
-		minval = np.min(dft[np.nonzero(dft)])
-		print minval				
-	else:
+#		minval = np.min(dft[np.nonzero(dft)])
+#		print minval
+#		print "none"				
+#	else:
 		#get what is the n-th lowest value according to the percentage
-	 	nth = int((array.shape[0]*percentage)/100)
+#	 	nth = int((array.shape[0]*percentage)/100)
 		#find n-th lowest value
-		minval = find_nth_smallest(array, nth)
-		print minval		
+#		minval = find_nth_smallest(array, nth)
+#		print minval
+#		print "percetage ",percentage		
 	
 	#makes every other point become equal to 0
 	result = equalize_rest_0(dft,minval)	
@@ -53,6 +62,7 @@ def idft_output(dft_shift,percentage=None):
 	phase_spectrum = (cv2.phase(img_back[:, :, 0], img_back[:, :, 1], True))
 
 	return phase_spectrum, magnitude_spectrum
+
 
 img = cv2.imread('../input/input-p1-3-1-0.jpg',0)
 dft = cv2.dft(np.float32(img),flags = cv2.DFT_COMPLEX_OUTPUT)
