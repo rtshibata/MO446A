@@ -2,6 +2,19 @@ import numpy as np
 import cv2
 from matplotlib import pyplot as plt
 
+#fill every element greater than minval as 0
+def equalize_rest_0(m,minval):
+	matrix = m
+	x , y,_= matrix.shape
+
+	#for i in range(x): 	
+	#	for j in range(y):
+	#		if matrix[i][j]>minval:
+	#			matrix[i][j] = 0
+	#for i in matrix: 	
+	#	print i
+	return matrix
+
 def find_nth_biggest(a, n):
     #sort the elements in the array a
 	result = sorted(a,reverse=True)
@@ -12,17 +25,17 @@ def find_nth_smallest(a, n):
 	result = sorted(a)
 	return result[n-1]
 
-def spectrum_lowest_values(spectrum,percentage=None):
+def spectrum_lowest_values(dft,percentage=None):
 	"""
 	selects the n% of the lowest values in phase spectrum
 	(bigger than 0)
 	"""
 	#no_zeros_array = np.trim_zeros(spectrum.flatten())
-	array = spectrum.flatten()
+	array = dft.flatten()
 	
 	if percentage is None:
 		#get the lowest value which is different of 0 
-		minval = np.min(spectrum[np.nonzero(spectrum)])
+		minval = np.min(dft[np.nonzero(dft)])
 		print minval				
 	else:
 		#get what is the n-th lowest value according to the percentage
@@ -32,9 +45,10 @@ def spectrum_lowest_values(spectrum,percentage=None):
 		print minval		
 	
 	#makes every other point become equal to 0
-	spectrum[spectrum > minval] = 0
+	result = equalize_rest_0(dft,minval)	
+	#dft[dft > minval] = 0
 	
-	return spectrum
+	return result
 
 img = cv2.imread('../input/input-p1-3-1-0.jpg',0)
 
@@ -53,7 +67,7 @@ cv2.imwrite('../output/output-p1-3-1-0.png', magnitude_spectrum)
 cv2.imwrite('../output/output-p1-3-1-1.png', phase_spectrum)
 
 #takes only 1 point, the lowest value
-f_spec = spectrum_lowest_values(phase_spectrum)
+f_spec = spectrum_lowest_values(dft_shift)
 print "phase 1"
 f_ishift = np.fft.ifftshift(f_spec)
 img_back = cv2.idft(f_ishift, flags=cv2.DFT_SCALE)
@@ -63,10 +77,10 @@ f_spec2 = spectrum_lowest_values(magnitude_spectrum)
 print "magnitude 1"
 f_ishift2 = np.fft.ifftshift(f_spec2)
 img_back2 = cv2.idft(f_ishift2, flags=cv2.DFT_SCALE)
-magnitude_spectrum = (cv2.magnitude(img_back2[:,:,0],img_back2[:,:,1]))
+#magnitude_spectrum = (cv2.magnitude(img_back2[:,:,0],img_back2[:,:,1]))
 #cv2.imwrite('../output/output-p1-3-1-2.png', phase_spectrum)
 
-cv2.imwrite('../output/output-p1-3-1-7.png', magnitude_spectrum)
+#cv2.imwrite('../output/output-p1-3-1-7.png', magnitude_spectrum)
 
 #takes 25% of the lowest values
 f_spec = spectrum_lowest_values(phase_spectrum,25)

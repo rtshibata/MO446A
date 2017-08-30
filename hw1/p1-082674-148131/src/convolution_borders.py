@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
 import sys
+import os
 
 def zero (sub_img, i, j, l, h, hodd, lodd, height, length):
 	if i-h < 0:
@@ -90,21 +91,21 @@ def convolution (img_input, mask, border = 1):
 				img_output[i,j,n] = s
 	return img_output
 
-
-img = cv2.imread('../input/input-p1-2-1-1.jpg', 1)
+dir_path = os.path.dirname(os.path.realpath(__file__))
+img = cv2.imread(dir_path+'/../input/input-p1-2-1-1.jpg', 1)
 if img is None:
 	print("Image not found.")
 	sys.exit()
 #Kernel 15x15 box blur detection
 msk = np.full((15, 15), 1/(15*15))
 img_conv = convolution (img, msk, 0)
-cv2.imwrite('../output/output-p1-2-1-5.png', img_conv)
+cv2.imwrite(dir_path+'/../output/output-p1-2-1-5.png', img_conv)
 
 img_conv = convolution (img, msk, 1)
-cv2.imwrite('../output/output-p1-2-1-6.png', img_conv)
+cv2.imwrite(dir_path+'/../output/output-p1-2-1-6.png', img_conv)
 
 img_conv = convolution (img, msk, 2)
-cv2.imwrite('../output/output-p1-2-1-7.png', img_conv)
+cv2.imwrite(dir_path+'/../output/output-p1-2-1-7.png', img_conv)
 
 
 

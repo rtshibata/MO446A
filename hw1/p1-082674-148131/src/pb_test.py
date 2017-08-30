@@ -4,15 +4,16 @@ import laplacian_pyramid as lp
 import numpy as np
 import cv2
 import sys
+import os
 
-
+dir_path = os.path.dirname(os.path.realpath(__file__))
 # Apple
-imgleft = cv2.imread('../input/input-p1-2-4-0.jpg', 1)
+imgleft = cv2.imread(dir_path+'/../input/input-p1-2-4-0.jpg', 1)
 if imgleft is None:
 	print("Image 1 not found.")
 	sys.exit()
 # Orange
-imgright = cv2.imread('../input/input-p1-2-4-1.jpg', 1)
+imgright = cv2.imread(dir_path+'/../input/input-p1-2-4-1.jpg', 1)
 if imgright is None:
 	print("Image 2 not found.")
 	sys.exit()
@@ -27,17 +28,19 @@ lp_left = lp.LPyramid(imgleft, 5)
 lp_right = lp.LPyramid(imgright, 5)
 
 lp_result = pb.blend(lp_left, lp_right, gp_mask)
-cv2.imwrite('../output/output-p1-2-4-0.png', lp_result.access(4))
-cv2.imwrite('../output/output-p1-2-4-1.png', lp_result.access(2))
-cv2.imwrite('../output/output-p1-2-4-2.png', lp_result.access(0))
+#The Gaussian images of the result
+cv2.imwrite(dir_path+'/../output/output-p1-2-4-0.png', lp_result.access(4))
+cv2.imwrite(dir_path+'/../output/output-p1-2-4-1.png', lp_result.access(2))
+cv2.imwrite(dir_path+'/../output/output-p1-2-4-2.png', lp_result.access(0))
+
 
 # Guardians
-imgleft = cv2.imread('../input/input-p1-2-4-2.png', 1)
+imgleft = cv2.imread(dir_path+'/../input/input-p1-2-4-2.png', 1)
 if imgleft is None:
 	print("Image 3 not found.")
 	sys.exit()
 # Star Wars
-imgright = cv2.imread('../input/input-p1-2-4-3.png', 1)
+imgright = cv2.imread(dir_path+'/../input/input-p1-2-4-3.png', 1)
 if imgright is None:
 	print("Image 4 not found.")
 	sys.exit()
@@ -52,15 +55,26 @@ lp_left = lp.LPyramid(imgleft, 5)
 lp_right = lp.LPyramid(imgright, 5)
 
 lp_result = pb.blend(lp_left, lp_right, gp_mask)
-cv2.imwrite('../output/output-p1-2-4-3.png', lp_result.access(0))
+cv2.imwrite(dir_path+'/../output/output-p1-2-4-3.png', lp_result.access(0))
 
-# Night Sky
-imgleft = cv2.imread('../input/input-p1-2-4-4.png', 1)
+# Pre-made mask
+blend_mask = cv2.imread(dir_path+'/../input/input-p1-2-4-4.jpg', 1)
+if imgright is None:
+	print("Image 4 not found.")
+	sys.exit()
+blend_mask = blend_mask/255
+gp_mask = gp.GPyramid(blend_mask, 5)
+
+lp_result = pb.blend(lp_left, lp_right, gp_mask)
+cv2.imwrite(dir_path+'/../output/output-p1-2-4-4.png', lp_result.access(0))
+
+# Sun set
+imgleft = cv2.imread(dir_path+'/../input/input-p1-2-4-5.png', 1)
 if imgleft is None:
 	print("Image 3 not found.")
 	sys.exit()
-# Sea Creature
-imgright = cv2.imread('../input/input-p1-2-4-5.png', 1)
+# Space
+imgright = cv2.imread(dir_path+'/../input/input-p1-2-4-6.jpg', 1)
 if imgright is None:
 	print("Image 4 not found.")
 	sys.exit()
@@ -73,6 +87,5 @@ blend_mask = np.concatenate((blend_mask, np.zeros((height-height//2, length, 1))
 gp_mask = gp.GPyramid(blend_mask, 5)
 lp_left = lp.LPyramid(imgleft, 5)
 lp_right = lp.LPyramid(imgright, 5)
-
 lp_result = pb.blend(lp_left, lp_right, gp_mask)
-cv2.imwrite('../output/output-p1-2-4-4.png', lp_result.access(0))
+cv2.imwrite(dir_path+'/../output/output-p1-2-4-5.png', lp_result.access(0))

@@ -21,12 +21,12 @@ class GPyramid:
 			if image_down.shape[0] > expected_shape[0]:
 				image_down = np.delete(image_down, image_down.shape[0]-1, axis=0)
 				if image_down.shape[0] != expected_shape[0]:
-					print("Wrong shape in the axis=0. Expected shape:", expected_shape[0], "Shape given:", image_down.shape[0])
+					print("Wrong shape in the axis=0.")
 					return None
 			if image_down.shape[1] > expected_shape[1]:
 				image_down = np.delete(image_down, image_down.shape[1]-1, axis=1)
 				if image_down.shape[1] != expected_shape[1]:
-					print("Wrong shape in the axis=1. Expected shape:", expected_shape[1], "Shape given:", image_down.shape[1])
+					print("Wrong shape in the axis=1.")
 					return None
 
 		return image_down
