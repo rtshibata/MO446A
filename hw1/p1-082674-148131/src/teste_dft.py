@@ -7,7 +7,12 @@ img = cv2.imread('../input/input-p1-3-1-0.jpg',0)
 dft = cv2.dft(np.float32(img),flags = cv2.DFT_COMPLEX_OUTPUT)
 dft_shift = np.fft.fftshift(dft)
 
-magnitude_spectrum = 20*np.log(cv2.magnitude(dft_shift[:,:,0],dft_shift[:,:,1]))
+magnitude_spectrum = 20*np.log(cv2.magnitude(dft_shift[:, :, 0], dft_shift[:, :, 1], True))
+
+
+f_ishift = np.fft.ifftshift(dft_shift)
+img_back = cv2.idft(f_ishift, flags=cv2.DFT_SCALE)
+magnitude_spectrum = (cv2.magnitude(img_back[:,:,0],img_back[:,:,1]))
 
 #plt.subplot(121),plt.imshow(img, cmap = 'gray')
 #plt.title('Input Image'), plt.xticks([]), plt.yticks([])
@@ -15,4 +20,4 @@ magnitude_spectrum = 20*np.log(cv2.magnitude(dft_shift[:,:,0],dft_shift[:,:,1]))
 #plt.title('Magnitude Spectrum'), plt.xticks([]), plt.yticks([])
 #plt.show()
 
-cv2.imwrite('../output/teste.png', magnitude_spectrum)
+cv2.imwrite('../output/teste2.png', magnitude_spectrum)
