@@ -5,4 +5,4 @@ all:
 	python3.6 src/gp_test.py
 	python3.6 src/lp_test.py
 	python3.6 src/pb_test.py 
-	python3.6 src/fourier.py 
+	python3.6 src/teste_dft.py
