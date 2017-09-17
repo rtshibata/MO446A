@@ -54,32 +54,14 @@ class GPyramid:
 				self.images.append(self.up(self.images[i][0]))
 			return self.images[level]
 
-	def __init__(self, image, levels, oct_levels=3, o=math.sqrt(2)/2, k=2):
+	def __init__(self, image, levels, n_images=3, o=math.sqrt(2)/2, k=2):
 		self.images = []
-		octaves = [self.down(image, o=o)]
-		for j in range(oct_levels-1):
-			octaves.append(self.blur(octaves[j], k))
-		self.images.append(octaves)
+		img = [self.down(image, o=o)]
+		for j in range(n_images-1):
+			img.append(self.blur(img[j], k))
+		self.images.append(img)
 		for i in range(1, levels):
-			octaves = [self.up(self.images[i-1][0], o)]
-			for j in range(oct_levels-1):
-				octaves.append(self.blur(octaves[j], k))
-			self.images.append(octaves)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+			img = [self.up(self.images[i-1][0], o)]
+			for j in range(n_images-1):
+				img.append(self.blur(img[j], k))
+			self.images.append(img)

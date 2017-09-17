@@ -4,31 +4,99 @@ import gaussian_pyramid_alt as gp
 import math
 
 class Sift:	
-
-	# Find the magnitude and orientation
-	@staticmethod
-	def magnitude_orientation(image):
-		h, l = image.shape[0], image.shape[1]
-		magnitude = np.zeros(image.shape, dtype='int64')
-		orientation = np.zeros(image.shape, dtype='int64')
-		for i in range(h-1):
-			for j in range(l-1):
-				magnitude[i,j] = math.sqrt(math.pow(image[i,j]-image[i+1,j], 2) + math.pow(image[i,j]-image[i,j+1], 2))
-				orientation[i,j] = math.atan2(image[i,j]-image[i+1,j], image[i,j+1]-image[i,j])
-		return magnitude, orientation	
-
-	# INCOMPLETE
-	# Creates histograms of the key points' area to find a orientation for each key point
-	def threshold (self, mag_threshold, ori_threshold):	
+	# Find descriptors for each keypoint
+	def get_descriptors(self, o=math.sqrt(2)):
+		gauss_vector = cv2.getGaussianKernel(16, o)		
+		gauss_array = np.dot(gauss_vector, np.transpose(gauss_vector))
+		self.desc_list = []
 		for l in range(1 ,len(self.dog)-1):
 			for o in range(len(self.dog[0])):
-				magnitude, orientation = self.magnitude_orientation(self.dog[l][o])
+				desc = np.empty((len(self.key_points[l-1][o]), 128))
+				desc_i=0
+				for kp in self.key_points[l-1][o]:
+					i, j = kp
+					image16 = self.dog[l][o][i-8:i+8, j-8:j+8]
+					for w1 in range(0, 16, 4):
+						for w2 in range(0, 16, 4):
+							image4 = image16[w1:w1+4, w2:w2+4]
+							weight = gauss_array[w1:w1+4, w2:w2+4]
+							histogram = self.keypoint_histogram(image4, 8, weight)
+							desc_j = w2*2 + 8*w1
+							for h in range(len(histogram)):
+								desc[desc_i, desc_j+h] = histogram[h]
+					desc_i+=1
+				self.desc_list.append(desc)
+		
+	# Creates histogram
+	@staticmethod
+	def keypoint_histogram(image, size=36, weight=None):
+		h, l = image.shape[0], image.shape[1]
+		if weight is None:
+			weight = np.ones(image.shape)
+		magnitude = np.zeros(image.shape)
+		orientation = np.zeros(image.shape)
+		histogram = np.zeros(size)
+		div = 360/size
+		for i in range(h-1):
+			for j in range(l-1):
+				x = float(image[i,j])-float(image[i+1,j])
+				y = float(image[i,j])-float(image[i,j+1])
+				x2 = float(image[i,j])-float(image[i+1,j])
+				y2 = float(image[i,j+1])-float(image[i,j])
+				magnitude[i,j] = weight[i,j]*math.sqrt(math.pow(x, 2) + math.pow(y, 2))
+				orientation[i,j] = math.degrees(math.atan2(x2, y2))
+				histogram[int(orientation[i,j]//div)] += int(magnitude[i,j])
+		return histogram	
+
+	# Get the orientation of each key point, 
+	# if some key point has more then one possible orientaion
+	# then creates new key points for these orientations
+	def key_orientation(self):
+		self.key_points_struct = []
+		for l in range(1 ,len(self.dog)-1):
+			kps_line=[]
+			for o in range(len(self.dog[0])):
+				new_kp_list = []
+				c = o+1
+				for kp in self.key_points[l-1][o]:
+					i, j = kp
+					sub_image = self.dog[l][o][i-1*c:i+1*c+1, j-1*c:j+1*c+1]
+					histogram = self.keypoint_histogram(sub_image)
+					indx = np.argmax(histogram)
+					threshold = histogram[indx]*0.8
+					new_kp = cv2.KeyPoint(i, j, _size=3*c, _angle=indx*10, _octave=l)
+					new_kp_list.append(new_kp)
+					other_keys = np.where(histogram>=threshold)
+					for ok in other_keys[0]:
+						if ok != indx:
+							new_kp = cv2.KeyPoint(i, j, _size=3*c, _angle=indx*ok*10, _octave=l)
+							new_kp_list.append(new_kp)
+				kps_line.append(new_kp_list) 
+			self.key_points_struct.append(kps_line)
+
+	# Find the magnitude
+	@staticmethod
+	def magnitude(image):
+		h, l = image.shape[0], image.shape[1]
+		magnitude = np.zeros(image.shape)
+		for i in range(h-1):
+			for j in range(l-1):
+				x = float(image[i,j])-float(image[i+1,j])
+				y = float(image[i,j])-float(image[i,j+1])
+				magnitude[i,j] = math.sqrt(math.pow(x, 2) + math.pow(y, 2))
+		return magnitude
+
+	# Removes points with magnitudes lower than the threshold
+	def threshold (self, mag_threshold=100):	
+		for l in range(1 ,len(self.dog)-1):
+			for o in range(len(self.dog[0])):
+				magnitude = self.magnitude(self.dog[l][o])
 				new_kp = []
 				for kp in self.key_points[l-1][o]:
 					if magnitude[kp] >= mag_threshold:
 						new_kp.append(kp)
 				self.key_points[l-1][o] = new_kp
-		self.img_key_points()
+		self.img_key_points()		
 
 	# Look for edges on the key points
 	# Remove points that are not edges based on the threshold
@@ -36,18 +104,18 @@ class Sift:
 		msk1 = np.array([[-1,-2,1],	[0, 0, 0], [1, 2, 1]])
 		msk2 = np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]])
 		
-		for l in range(1 ,len(self.dog)-1):
-			for o in range(len(self.dog[0])):
-				Ix = cv2.filter2D(self.dog[l][o], -1, msk1)
-				Iy = cv2.filter2D(self.dog[l][o], -1, msk2)
+		for l in range(1 ,len(self.GP.images)-1):
+			for o in range(len(self.GP.images[0])-1):
+				Ix = cv2.filter2D(self.GP.images[l][o], -1, msk1)
+				Iy = cv2.filter2D(self.GP.images[l][o], -1, msk2)
 				new_kp = []
 				for kp in self.key_points[l-1][o]:
 					i, j = kp
-					sub_Ix = Ix[i-1:i+1, j-1:j+1]
-					sub_Iy = Iy[i-1:i+1, j-1:j+1]
-					M = np.array([	[ np.sum(np.multiply(sub_Ix, sub_Ix)), np.sum(np.multiply(sub_Ix, sub_Iy))],
-									[ np.sum(np.multiply(sub_Ix, sub_Iy)), np.sum(np.multiply(sub_Iy, sub_Iy))] ])
-					R = np.linalg.det(M) - k*math.pow(np.trace(M), 2)
+					sub_Ix = Ix[i-1:i+2, j-1:j+2]
+					sub_Iy = Iy[i-1:i+2, j-1:j+2]
+					M = np.array([	[ float(np.sum(np.multiply(sub_Ix, sub_Ix))), float(np.sum(np.multiply(sub_Ix, sub_Iy)))],
+									[ float(np.sum(np.multiply(sub_Ix, sub_Iy))), float(np.sum(np.multiply(sub_Iy, sub_Iy)))] ])
+					R = M[0,0]*M[1,1] - M[0,1]*M[1,0] - k*math.pow(np.trace(M), 2)
 					if R >= threshold:
 						new_kp.append(kp)
 				self.key_points[l-1][o] = new_kp
@@ -118,11 +186,11 @@ class Sift:
 			dog.append(level_dog)
 		return dog
 		
-	def __init__(self, image, levels, oct_levels, o, k):
-		if levels < 4:
-			print("At least 4 levels required, value given was:", blur_levels)
+	def __init__(self, image, levels, img_per_pyramid, o, k):
+		if levels < 3:
+			print("At least 3 levels required, value given was:", levels)
 			return -1
-		self.GP = gp.GPyramid(image, levels, oct_levels,  o, k)
+		self.GP = gp.GPyramid(image, levels, img_per_pyramid,  o, k)
 		self.dog = self.diference_of_gaussian(self.GP.images, o, k)
 		self.get_all_keypoints()
 		self.img_key_points()
