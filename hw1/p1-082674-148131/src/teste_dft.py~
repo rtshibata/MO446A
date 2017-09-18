@@ -91,6 +91,6 @@ blend_mask = np.ones((height, length//2))
 blend_mask = np.concatenate((blend_mask, np.zeros((height, length-length//2))), axis=1)
 
 
-fourier_result = fourier.blend(dft_shift_l, dft_shift_r, blend_mask)
-cv2.imwrite('../output/output-p1-3-2-0.png', fourier_result[0])
+fourier_result = fourier.blend(imgleft, imgright, blend_mask)
+#cv2.imwrite('../output/output-p1-3-2-0.png', fourier_result[0])
 cv2.imwrite('../output/output-p1-3-2-1.png', fourier_result[1])

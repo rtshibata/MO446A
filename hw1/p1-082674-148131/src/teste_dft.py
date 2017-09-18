@@ -69,7 +69,7 @@ cv2.imwrite('../output/output-p1-3-1-16.png', spectrums[0])
 cv2.imwrite('../output/output-p1-3-1-21.png', spectrums[1])
 
 #blending images:
-#dir_path = os.path.dirname(os.path.realpath(__file__))
+
 # Messi
 imgleft = cv2.imread(#dir_path+
 '../input/input-p1-3-1-0.jpg', 0)
@@ -92,5 +92,5 @@ blend_mask = np.concatenate((blend_mask, np.zeros((height, length-length//2))), 
 
 
 fourier_result = fourier.blend(imgleft, imgright, blend_mask)
-cv2.imwrite('../output/output-p1-3-2-0.png', fourier_result[0])
+#cv2.imwrite('../output/output-p1-3-2-0.png', fourier_result[0])
 cv2.imwrite('../output/output-p1-3-2-1.png', fourier_result[1])

@@ -5,7 +5,8 @@ import os
 import math
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
-img = cv2.imread(dir_path+'/../input/input-p1-3-1-0.jpg', 0)
+#img = cv2.imread(dir_path+'/../input/input-p1-3-1-0.jpg', 0)
+img = cv2.imread(dir_path+'/../input/input-p1-3-2-1.jpg', 0)
 sift = sift.Sift(img, 3, 2, math.sqrt(2), 2)
 if img is None:
 	print("Image not found.")
@@ -44,3 +45,5 @@ for l in range(1, len(sift.dog)-1):
 		counter = counter+1
 sift.get_descriptors()
 print(sift.desc_list[0][0])
+#a
+print(len(sift.desc_list[0]))
