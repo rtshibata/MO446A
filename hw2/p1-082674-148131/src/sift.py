@@ -3,7 +3,8 @@ import numpy as np
 import gaussian_pyramid_alt as gp
 import math
 
-class Sift:	
+class Sift:
+
 	# Find descriptors for each keypoint
 	def get_descriptors(self, o=math.sqrt(2)):
 		gauss_vector = cv2.getGaussianKernel(16, o)		
@@ -11,16 +12,16 @@ class Sift:
 		self.desc_list = []
 		for l in range(1 ,len(self.dog)-1):
 			for o in range(len(self.dog[0])):
-				desc = np.empty((len(self.key_points[l-1][o]), 128))
+				desc = np.empty((len(self.key_points_struct[l-1][o]), 128))
 				desc_i=0
-				for kp in self.key_points[l-1][o]:
-					i, j = kp
+				for kp in self.key_points_struct[l-1][o]:
+					i, j = int(kp.pt[0]), int(kp.pt[1])
 					image16 = self.dog[l][o][i-8:i+8, j-8:j+8]
 					for w1 in range(0, 16, 4):
 						for w2 in range(0, 16, 4):
 							image4 = image16[w1:w1+4, w2:w2+4]
 							weight = gauss_array[w1:w1+4, w2:w2+4]
-							histogram = self.keypoint_histogram(image4, 8, weight)
+							histogram = self.keypoint_histogram(image4, 8, weight, kp.angle)
 							desc_j = w2*2 + 8*w1
 							for h in range(len(histogram)):
 								desc[desc_i, desc_j+h] = histogram[h]
@@ -29,7 +30,7 @@ class Sift:
 		
 	# Creates histogram
 	@staticmethod
-	def keypoint_histogram(image, size=36, weight=None):
+	def keypoint_histogram(image, size=36, weight=None, kp_angle=0):
 		h, l = image.shape[0], image.shape[1]
 		if weight is None:
 			weight = np.ones(image.shape)
@@ -44,7 +45,7 @@ class Sift:
 				x2 = float(image[i,j])-float(image[i+1,j])
 				y2 = float(image[i,j+1])-float(image[i,j])
 				magnitude[i,j] = weight[i,j]*math.sqrt(math.pow(x, 2) + math.pow(y, 2))
-				orientation[i,j] = math.degrees(math.atan2(x2, y2))
+				orientation[i,j] = (math.degrees(math.atan2(x2, y2)) - kp_angle)%360
 				histogram[int(orientation[i,j]//div)] += int(magnitude[i,j])
 		return histogram	
 
