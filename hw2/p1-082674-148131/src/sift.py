@@ -6,7 +6,7 @@ import math
 class Sift:
 
 	# Find descriptors for each keypoint
-	def get_descriptors(self, o=math.sqrt(2)):
+	def get_descriptors(self, threshold=0.2, o=math.sqrt(2)):
 		gauss_vector = cv2.getGaussianKernel(16, o)		
 		gauss_array = np.dot(gauss_vector, np.transpose(gauss_vector))
 		self.desc_list = []
@@ -26,6 +26,8 @@ class Sift:
 							for h in range(len(histogram)):
 								desc[desc_i, desc_j+h] = histogram[h]
 					desc_i+=1
+				desc = desc/np.sum(desc)
+				desc = np.where(desc>threshold, threshold, desc)
 				self.desc_list.append(desc)
 		
 	# Creates histogram
