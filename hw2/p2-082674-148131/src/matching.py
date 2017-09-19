@@ -4,11 +4,11 @@ import os
 import math
 from scipy.spatial import distance
 
-#usa distancia euclidiana para comparar os descritores
+# usa distancia euclidiana para comparar os descritores
 def cmp_desc(desc1, desc2):
 	return distance.euclidean(desc1,desc2)
 	
-#tem q depois atualizar para excluir/atualizar a lista dos descritores a cd iteracao
+# tem q depois atualizar para excluir/atualizar a lista dos descritores a cd iteracao
 def find_matches(descriptor1, descriptor2,t):
 	pts_matches = []
 	chosen_list = [False for i in range(descriptor2.shape[0])]

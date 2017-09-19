@@ -2,7 +2,7 @@ import cv2
 import sys
 import os
 
-#Arquivo que abre video le imagem por image transforma em cinza e mostra a image.
+#Arquivo simples para testar video
 #Naõ consegui roda-lo no opencv da minha maquina, tive que usar o docker
 #Parece que precisa ter almas bibliotaca que não tenho
 #Mas como funcionou usando o docker não tem problema.

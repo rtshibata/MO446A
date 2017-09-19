@@ -4,9 +4,11 @@ import gaussian_pyramid_alt as gp
 import math
 
 class Sift:
+	# Get numpy array of descriptors
 	def get_descriptors(self):
 		return self.desc_list
 
+	# Get list of KeyPoints
 	def get_keypoints(self):
 		return self.all_keypoints
 
