@@ -96,47 +96,7 @@ list_index_desc = m.find_matches(sift1,sift2,t_semelhanca)
 #RANSAC
 n_ransac = len(list_index_desc)//3 #3 sem criterio
 threshold = 10 #numero sem criterio
-good_model =  len(list_index_desc)//2 #mais de 50% ok
-maybe_model = []
-consensus_set = []
-list3p= []
-best_error = math.inf
+n_good_model =  len(list_index_desc)//2 #mais de 50% ok
 
-for count in range(n_ransac)
-	list3p = list_index_desc[3*count:3*(count+1)]
-	consensus_set = list3p
-	not_inliers = list_index_desc[:3*count] + list_index_desc[3*(count+1):]
-	i1, j1 = list3p[0]
-	ponto1 = sift1.key_points.struct[i1].pt
-	ponto1_ = sift2.key_points.struct[j1].pt
-	i2, j2 = list3p[1]
-	ponto2 = sift1.key_points.struct[i2].pt
-	ponto2_ = sift2.key_points.struct[j2].pt
-	i3, j3 = list3p[2]
-	ponto3 = sift1.key_points.struct[i3].pt
-	ponto3_ = sift2.key_points.struct[j3].pt
-	#selects possible inliers	
-	list3p = [ponto1,ponto2,ponto3,ponto1_,ponto2_,ponto3_]
-	#affine transformation
-	a = AffineTransf(list3p)
-	#gets possible model
-	maybe_model = a.getA()
-	## qdo tiver menos de 3 descritores em not_inliers, cancelar o teste de erro
-	## !!!!!!!!!
-	###!!!!!!!!
-	for index_desc in not_inliers:
-		if a.error(list_index_desc) < t:
-			consensus_set.append(index_desc)
-	
-	if len(consensus_set) > good_model:
-		this_model = maybe_model
-		sample1= randrange(0,len(consensus_set))
-		sample2= randrange(0,len(consensus_set))
-		sample3= randrange(0,len(consensus_set))
-		list_sample = [sample1,sample2,sample3]
-		this_error = a.error(list_sample)
-		if this_error < best_error:
-			best_model = this_model
-			best_consensus_set = consensus_set
-			best_error = this_error		
-	#https://www.cse.buffalo.edu/~jryde/lectures/cse410/MobileRobotMapping_2.html
+transformationA,error,_ = ransac(n_ransac, threshold, n_good_model)
+
