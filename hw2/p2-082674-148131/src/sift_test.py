@@ -90,6 +90,6 @@ print(len(sift2.desc_list[0][0]))
 n_pixels,_ = sift1.dog[0][0].shape
 t_semelhanca = n_pixels/2
 list_points = m.find_matches(sift1,sift2,t_semelhanca)
-
+print(list_points)
 #RANSAC
 
