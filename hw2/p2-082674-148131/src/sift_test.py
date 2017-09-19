@@ -5,6 +5,8 @@ import os
 import math
 import matching as m
 import random
+import transform
+import ransac as ran
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 img = cv2.imread(dir_path+'/../input/input-p2-3-1-0.jpg', 0)
@@ -98,5 +100,8 @@ n_ransac = len(list_index_desc)//3 #3 sem criterio
 threshold = 10 #numero sem criterio
 n_good_model =  len(list_index_desc)//2 #mais de 50% ok
 
-transformationA,error,_ = ransac(n_ransac, threshold, n_good_model)
+A,error,_ = ran.ransac(sift1,sift2,n_ransac, threshold, n_good_model,list_index_desc)
+
+#transform using all the matches, generalization of solving XA = Y
+final_A = transform.final_transform(list_index_desc)
 

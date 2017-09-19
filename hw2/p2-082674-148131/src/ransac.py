@@ -5,16 +5,26 @@ import os
 import math
 import matching as m
 import random
+import transform
 
 #RANSAC
 #https://www.cse.buffalo.edu/~jryde/lectures/cse410/MobileRobotMapping_2.html
-def ransac(n_ransac, threshold, n_good_model):
+def ransac(sift1,sift2,n_ransac, threshold, n_good_model,list_index_desc):
+	if n_ransac >= len(list_index_desc):
+		print("Numero N deve ser menor que o numero dos pares de pontos matched dos descritores\n")
+		return -1
+
 	maybe_model = []
 	consensus_set = []
 	list3p= []
 	best_error = math.inf
 
 	for count in range(n_ransac):
+		if 3*count >= len(list_index_desc):
+			break
+		elif len(list_index_desc[3*count:3*(count+1)]) < 3:
+			break
+
 		list3p = list_index_desc[3*count:3*(count+1)]
 		consensus_set = list3p
 		not_inliers = list_index_desc[:3*count] + list_index_desc[3*(count+1):]
@@ -30,7 +40,7 @@ def ransac(n_ransac, threshold, n_good_model):
 		#selects possible inliers	
 		list3p = [ponto1,ponto2,ponto3,ponto1_,ponto2_,ponto3_]
 		#affine transformation
-		a = AffineTransf(list3p)
+		a = transform.AffineTransf(list3p)
 		#gets possible model
 		maybe_model = a.getA()
 		#pega de 3 em 3
