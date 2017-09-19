@@ -63,5 +63,4 @@ class AffineTransf:
 			XA_product = np.dot(self.A,X)
 			result = np.subtract(XA_product,Y)
 			total_error = np.sum(np.absolute(result))
-			return total_error
 
