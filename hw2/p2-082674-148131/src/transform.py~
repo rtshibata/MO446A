@@ -107,5 +107,132 @@ class AffineTransf:
 		inverse1 = np.linalg(product1)
 		product2 = np.dot(Xt,Y)
 		A = np.dot(inverse1,product2)
-					
+		return A			
+
+class ProjectTransf:	
+	def __init__(self, list_4pt_matches):
+		if len(list_4pt_matches) != 8:
+			print("4 points of each image required")
+			return -1
+		for pt_match in list_4pt_matches:
+			if not isinstance(pt_match, tuple):
+				print("point matches must be tuples")
+				return -1
+		
+		x1 , y1 = list_4pt_matches[0]
+		x1_, y1_ = list_4pt_matches[4]	
+		x2 , y2 = list_4pt_matches[1]
+		x2_, y2_ = list_4pt_matches[5]	
+		x3 , y3 = list_4pt_matches[2]
+		x3_, y3_ = list_4pt_matches[6]
+		x4 , y4 = list_4pt_matches[3]
+		x4_, y4_ = list_4pt_matches[7]
+	
+		X = np.matrix([[x1, y1, 1, 0, 0, 0, 0, 0, 0],
+						[0, 0, 0, x1, y1, 1, 0, 0, 0],
+						[0, 0, 0, 0, 0, 0, x1, y1, 1],
+						[x2, y2, 1, 0, 0, 0, 0, 0, 0],
+					  	[0, 0, 0, x2, y2, 1, 0, 0, 0],
+						[0, 0, 0, 0, 0, 0, x2, y2, 1],					  	
+						[x3, y3, 1, 0, 0, 0, 0, 0, 0],
+					  	[0, 0, 0, x3, y3, 1, 0, 0, 0],
+						[0, 0, 0, 0, 0, 0, x3, y3, 1],
+						[x4, y4, 1, 0, 0, 0, 0, 0, 0],
+					  	[0, 0, 0, x4, y4, 1, 0, 0, 0],
+						[0, 0, 0, 0, 0, 0, x4, y4, 1]])
+		
+		Y = np.array([x1_,y1_,x2_,y2_,x3_,y3_,x4_,y4_,1])
+		Xt = X.transpose()
+		product1 = np.dot(Xt,X)
+		inverse1 = np.linalg(product1)
+		product2 = np.dot(Xt,Y)
+		A = np.dot(inverse1,product2)
+		self.A = A
+
+	def getA(self):
+		return self.A
+		
+	#calcula a diferenca entre XA e Y esperado: somatorio|XA - Y| = erro
+	def error(self,list_p):
+		if len(list_p) != 8:
+			print("4 points of each image required")
+			return -1
+		for pt_match in list_p:
+			if not isinstance(pt_match, tuple):
+				print("point matches must be tuples")
+				return -1
+		
+		x1 , y1 = list_4pt_matches[0]
+		x1_, y1_ = list_4pt_matches[4]	
+		x2 , y2 = list_4pt_matches[1]
+		x2_, y2_ = list_4pt_matches[5]	
+		x3 , y3 = list_4pt_matches[2]
+		x3_, y3_ = list_4pt_matches[6]
+		x4 , y4 = list_4pt_matches[3]
+		x4_, y4_ = list_4pt_matches[7]
+				
+		X = np.matrix([[x1, y1, 1, 0, 0, 0, 0, 0, 0],
+						[0, 0, 0, x1, y1, 1, 0, 0, 0],
+						[0, 0, 0, 0, 0, 0, x1, y1, 1],
+						[x2, y2, 1, 0, 0, 0, 0, 0, 0],
+					  	[0, 0, 0, x2, y2, 1, 0, 0, 0],
+						[0, 0, 0, 0, 0, 0, x2, y2, 1],					  	
+						[x3, y3, 1, 0, 0, 0, 0, 0, 0],
+					  	[0, 0, 0, x3, y3, 1, 0, 0, 0],
+						[0, 0, 0, 0, 0, 0, x3, y3, 1],
+						[x4, y4, 1, 0, 0, 0, 0, 0, 0],
+					  	[0, 0, 0, x4, y4, 1, 0, 0, 0],
+						[0, 0, 0, 0, 0, 0, x4, y4, 1]])
+
+		Y = np.array([x1_,y1_,x2_,y2_,x3_,y3_])
+		XA_product = np.dot(self.A,X)
+		result = np.subtract(XA_product,Y)
+		total_error = np.sum(np.absolute(result))
+		return total_error
+
+	@staticmethod
+	def final_transform(self,list_index_desc):
+		list_p = []
+		list_p_ = []
+		for count in range(len(list_index_desc)):
+			i, j = list_index_desc[count]
+			list_p.append(sift1.key_points.struct[i].pt)
+			list_p_.append(sift2.key_points.struct[j].pt)
+		list_x = []
+		list_y = []
+		list_x_ = []
+		list_y_ = []
+		for count in range(len(list_p)):
+			xp, yp = list_p[count]
+			list_x.append(xp)
+			list_y.append(yp)
+		for count in range(len(list_p_)):
+			xp_, yp_ = list_p[count]
+			list_x_.append(xp_)
+			list_y_.append(yp_)
+		Y = np.array([])
+		for i in range(len(list_x_)):
+			Y.append(list_x[i])
+			Y.append(list_y[i])
+		row_length = 6
+		X = np.array([[]])
+		for i in range(2*len(list_index_desc)):
+			if i%2==0:
+				X[i][3] = X[i][4] = X[i][5] = 0
+				X[i][0] = list_x[i//2]
+ 				X[i][1] = list_y[i//2]
+ 				X[i][2] = 1
+			else:
+				X[i][0] = X[i][1] = X[i][2] = 0
+				X[i][3] = list_x[i//2]
+ 				X[i][4] = list_y[i//2]
+ 				X[i][5] = 1
+		#print(X)
+		Xt = X.transpose()
+		product1 = np.dot(Xt,X)
+		inverse1 = np.linalg(product1)
+		product2 = np.dot(Xt,Y)
+		A = np.dot(inverse1,product2)
+		return A			
 			
+	

@@ -100,8 +100,10 @@ n_ransac = len(list_index_desc)//3 #3 sem criterio
 threshold = 10 #numero sem criterio
 n_good_model =  len(list_index_desc)//2 #mais de 50% ok
 
-A,error,_ = ran.ransac(sift1,sift2,n_ransac, threshold, n_good_model,list_index_desc)
+A,error,new_list_index_desc = ran.ransac_affine(sift1,sift2,n_ransac, threshold, n_good_model,list_index_desc)
+#A,error,new_list_index_desc = ran.ransac_project(sift1,sift2,n_ransac, threshold, n_good_model,list_index_desc)
 
 #transform using all the matches, generalization of solving XA = Y
-final_A = transform.final_transform(list_index_desc)
+final_A = transform.AffineTransf.final_transform(new_list_index_desc)
+#final_A = transform.ProjectTransf.final_transform(new_list_index_desc)
 
