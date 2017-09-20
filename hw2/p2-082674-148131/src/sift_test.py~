@@ -9,13 +9,16 @@ import transform
 import ransac as ran
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
-img = cv2.imread(dir_path+'/../input/input-p2-3-1-0.jpg', 0)
-#img = cv2.imread(dir_path+'/../input/input-p2-3-2-1.jpg', 0)
-sift1 = s.Sift(img, 3, 2, math.sqrt(2), 2)
-if img is None:
+img_orig1 = cv2.imread(dir_path+'/../input/input-p2-3-1-0.jpg', 1)
+if img_orig1 is None:
+	print("Image not found.")
+	sys.exit()
+img1 = cv2.cvtColor(img_orig1, cv2.COLOR_BGR2GRAY)
+if img1 is None:
 	print("Image not found.")
 	sys.exit()
 
+sift1 = s.Sift(img1, 9, 2, math.sqrt(2), 2)
 output = dir_path+'/../output/output-p2-3-1-'
 counter = 0
 for l in range(len(sift1.GP.images)):
@@ -30,31 +33,36 @@ for l in range(len(sift1.array_points)):
 	for o in range(len(sift1.array_points[0])):
 		cv2.imwrite(output+str(counter)+'.png', sift1.array_points[l][o]+sift1.GP.images[l+1][o])
 		counter = counter+1
-sift1.threshold(200)
+sift1.threshold(100)
 for l in range(len(sift1.array_points)):
 	for o in range(len(sift1.array_points[0])):
 		cv2.imwrite(output+str(counter)+'.png', sift1.array_points[l][o]+sift1.GP.images[l+1][o])
 		counter = counter+1
-sift1.find_edges(threshold = 50, k = 0.2)
+sift1.find_edges(threshold = 20, k = 0.2)
 for l in range(len(sift1.array_points)):
 	for o in range(len(sift1.array_points[0])):
 		cv2.imwrite(output+str(counter)+'.png', sift1.array_points[l][o]+sift1.GP.images[l+1][o])
 		counter = counter+1
 sift1.key_orientation()
-for l in range(1, len(sift1.dog)-1):
-	for o in range(len(sift1.dog[0])):
-		img_out = np.empty(sift1.GP.images[l][o].shape)
-		cv2.drawKeypoints(sift1.GP.images[l][o], sift1.key_points_struct[l-1][o], img_out, 3)
-		cv2.imwrite(output+str(counter)+'.png', img_out)
-		counter = counter+1
-sift1.get_descriptors()
+img_out = img_orig1
+cv2.drawKeypoints(img1, sift1.get_keypoints(), img_out, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+cv2.imwrite(output+str(counter)+'.png', img_out)
+counter = counter+1
+sift1.find_descriptors()
+sift1_desc = sift1.get_descriptors()
+sift1_key = sift1.get_keypoints()
 
-img = cv2.imread(dir_path+'/../input/input-p1-3-1-01.jpg', 0)
-#img = cv2.imread(dir_path+'/../input/input-p1-3-2-1.jpg', 0)
-sift2 = s.Sift(img, 3, 2, math.sqrt(2), 2)
-if img is None:
+
+img_orig2 = cv2.imread(dir_path+'/../input/input-p2-3-1-1.jpg', 1)
+if img_orig2 is None:
 	print("Image not found.")
 	sys.exit()
+img2 = cv2.cvtColor(img_orig2, cv2.COLOR_BGR2GRAY)
+if img2 is None:
+	print("Image not found.")
+	sys.exit()
+
+sift2 = s.Sift(img2, 9, 2, math.sqrt(2), 2)
 for l in range(len(sift2.GP.images)):
 	for o in range(len(sift2.GP.images[0])):
 		cv2.imwrite(output+str(counter)+'.png', sift2.GP.images[l][o])
@@ -67,42 +75,46 @@ for l in range(len(sift2.array_points)):
 	for o in range(len(sift2.array_points[0])):
 		cv2.imwrite(output+str(counter)+'.png', sift2.array_points[l][o]+sift2.GP.images[l+1][o])
 		counter = counter+1
-sift2.threshold(200)
-for l in range(len(sift2.array_points)):
+sift2.threshold(100)
+for l in range(len(sift2.array_points)):	
 	for o in range(len(sift2.array_points[0])):
 		cv2.imwrite(output+str(counter)+'.png', sift2.array_points[l][o]+sift2.GP.images[l+1][o])
 		counter = counter+1
-sift2.find_edges(threshold = 50, k = 0.2)
+sift2.find_edges(threshold = 20, k = 0.2)
 for l in range(len(sift2.array_points)):
 	for o in range(len(sift2.array_points[0])):
 		cv2.imwrite(output+str(counter)+'.png', sift2.array_points[l][o]+sift2.GP.images[l+1][o])
 		counter = counter+1
 sift2.key_orientation()
-for l in range(1, len(sift2.dog)-1):
-	for o in range(len(sift2.dog[0])):
-		img_out = np.empty(sift2.GP.images[l][o].shape)
-		cv2.drawKeypoints(sift2.GP.images[l][o], sift2.key_points_struct[l-1][o], img_out, 3)
-		cv2.imwrite(output+str(counter)+'.png', img_out)
-		counter = counter+1
-sift2.get_descriptors()
-print("numero de pontos de interesse de cada img\n  ")
-print(len(sift1.desc_list[0][0]))
-print(len(sift2.desc_list[0][0]))
+img_out = img_orig2
+cv2.drawKeypoints(img2, sift2.get_keypoints(), img_out, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+cv2.imwrite(output+str(counter)+'.png', img_out)
+counter = counter+1
+sift2.find_descriptors()
+sift2_desc = sift2.get_descriptors()
+sift2_key = sift2.get_keypoints()
 
 #match hypothesis
 n_pixels,_ = sift1.dog[0][0].shape
-t_semelhanca = n_pixels//2
-list_index_desc = m.find_matches(sift1,sift2,t_semelhanca)
-#print(list_index_desc)
+t_semelhanca = n_pixels/2
+list_points = m.find_matches(sift1_desc,sift2_desc,t_semelhanca)
+print("Interest points matching:", list_points)
 
+'''
 #RANSAC
 n_ransac = len(list_index_desc)//3 #3 sem criterio
 threshold = 10 #numero sem criterio
 n_good_model =  len(list_index_desc)//2 #mais de 50% ok
 
+<<<<<<< HEAD
 A,error,new_list_index_desc = ran.ransac_affine(sift1,sift2,n_ransac, threshold, n_good_model,list_index_desc)
+#A,error,new_list_index_desc = ran.ransac_project(sift1,sift2,n_ransac, threshold, n_good_model,list_index_desc)
 
 #transform using all the matches, generalization of solving XA = Y
 final_A = transform.AffineTransf.final_transform(new_list_index_desc)
 #final_A = transform.ProjectTransf.final_transform(new_list_index_desc)
 
+=======
+transformationA,error,_ = ransac(n_ransac, threshold, n_good_model)
+'''
+>>>>>>> e98f7e756ce9cc0efc6a6fa6b0157c63ee24a654

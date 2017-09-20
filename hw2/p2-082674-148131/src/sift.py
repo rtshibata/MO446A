@@ -4,12 +4,19 @@ import gaussian_pyramid_alt as gp
 import math
 
 class Sift:
+	# Get numpy array of descriptors
+	def get_descriptors(self):
+		return self.desc_list
+
+	# Get list of KeyPoints
+	def get_keypoints(self):
+		return self.all_keypoints
 
 	# Find descriptors for each keypoint
-	def get_descriptors(self, threshold=0.2, o=math.sqrt(2)):
+	def find_descriptors(self, threshold=0.2, o=math.sqrt(2)):
 		gauss_vector = cv2.getGaussianKernel(16, o)		
 		gauss_array = np.dot(gauss_vector, np.transpose(gauss_vector))
-		self.desc_list = []
+		self.desc_list = np.empty((0, 128))
 		for l in range(1 ,len(self.dog)-1):
 			for o in range(len(self.dog[0])):
 				desc = np.empty((len(self.key_points_struct[l-1][o]), 128))
@@ -26,9 +33,11 @@ class Sift:
 							for h in range(len(histogram)):
 								desc[desc_i, desc_j+h] = histogram[h]
 					desc_i+=1
-				desc = desc/np.sum(desc)
-				desc = np.where(desc>threshold, threshold, desc)
-				self.desc_list.append(desc)
+				desc_sum = np.sum(desc)
+				if desc_sum != 0:
+					desc = desc/desc_sum
+					desc = np.where(desc>threshold, threshold, desc)
+				self.desc_list = np.append(self.desc_list, desc, 0)
 		
 	# Creates histogram
 	@staticmethod
@@ -56,24 +65,27 @@ class Sift:
 	# then creates new key points for these orientations
 	def key_orientation(self):
 		self.key_points_struct = []
+		self.all_keypoints = []
 		for l in range(1 ,len(self.dog)-1):
 			kps_line=[]
 			for o in range(len(self.dog[0])):
 				new_kp_list = []
-				c = o+1
+				c = int(math.pow(2,l-1))
 				for kp in self.key_points[l-1][o]:
 					i, j = kp
 					sub_image = self.dog[l][o][i-1*c:i+1*c+1, j-1*c:j+1*c+1]
 					histogram = self.keypoint_histogram(sub_image)
 					indx = np.argmax(histogram)
 					threshold = histogram[indx]*0.8
-					new_kp = cv2.KeyPoint(i, j, _size=3*c, _angle=indx*10, _octave=l)
+					new_kp = cv2.KeyPoint(i*c, j*c, _size=2*c+1, _angle=indx*10, _response=1, _octave=l-1)
 					new_kp_list.append(new_kp)
+					self.all_keypoints.append(new_kp)
 					other_keys = np.where(histogram>=threshold)
 					for ok in other_keys[0]:
 						if ok != indx:
-							new_kp = cv2.KeyPoint(i, j, _size=3*c, _angle=indx*ok*10, _octave=l)
+							new_kp = cv2.KeyPoint(i*c, j*c, _size=2*c+1, _angle=indx*ok*10, _response=1, _octave=l-1)
 							new_kp_list.append(new_kp)
+							self.all_keypoints.append(new_kp)
 				kps_line.append(new_kp_list) 
 			self.key_points_struct.append(kps_line)
 
@@ -132,7 +144,7 @@ class Sift:
 			for o in range(len(self.dog[0])):
 				ap = np.zeros(self.dog[l][o].shape)
 				for indx  in self.key_points[l-1][o]:
-					ap[indx] = self.dog[l][o][indx]
+					ap[indx] = 255
 				ap_list.append(ap)
 			self.array_points.append(ap_list)
 
