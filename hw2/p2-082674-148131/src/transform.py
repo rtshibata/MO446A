@@ -214,19 +214,25 @@ class ProjectTransf:
 		for i in range(len(list_x_)):
 			Y.append(list_x[i])
 			Y.append(list_y[i])
-		row_length = 6
+		Y.append(1)
+		row_length = 9
 		X = np.array([[]])
-		for i in range(2*len(list_index_desc)):
-			if i%2==0:
-				X[i][3] = X[i][4] = X[i][5] = 0
-				X[i][0] = list_x[i//2]
- 				X[i][1] = list_y[i//2]
+		for i in range(3*len(list_index_desc)):
+			if i%3==0: #rows:0,3,6,9,...
+				X[i][3] = X[i][4] = X[i][5] = X[i][6] = X[i][7] = X[i][8] = 0
+				X[i][0] = list_x[i//3]
+ 				X[i][1] = list_y[i//3]
  				X[i][2] = 1
-			else:
-				X[i][0] = X[i][1] = X[i][2] = 0
-				X[i][3] = list_x[i//2]
- 				X[i][4] = list_y[i//2]
+			elif (i-1)%3==0: #rows:1,4,7,10,...
+				X[i][0] = X[i][1] = X[i][2] = X[i][6] = X[i][7] = X[i][8] = 0
+				X[i][3] = list_x[i//3]
+ 				X[i][4] = list_y[i//3]
  				X[i][5] = 1
+			elif (i-2)%3==0: #rows:2,5,8,11,...
+				X[i][0] = X[i][1] = X[i][2] = X[i][3] = X[i][4] = X[i][5] = 0
+				X[i][6] = list_x[i//3]
+ 				X[i][7] = list_y[i//3]
+ 				X[i][8] = 1
 		#print(X)
 		Xt = X.transpose()
 		product1 = np.dot(Xt,X)
