@@ -25,12 +25,12 @@ class AffineTransf:
   					  [x3, y3, 1, 0, 0, 0],
   					  [0, 0, 0, x3, y3, 1]])
 		
-		Y = np.array([x1_,y1_,x2_,y2_,x3_,y3_])
+		Y = np.transpose(np.array([[x1_,y1_,x2_,y2_,x3_,y3_]]))
 		Xt = X.transpose()
 		product1 = np.dot(Xt,X)
-		inverse1 = np.linalg(product1)
+		inverse1 = np.linalg.inv(product1)
 		product2 = np.dot(Xt,Y)
-		A = np.dot(inverse1,product2)
+		A = np.dot(inverse1, product2)
 		self.A = A
 
 	def getA(self):
@@ -58,14 +58,14 @@ class AffineTransf:
 	  				[0, 0, 0, x2, y2, 1],
 	  				[x3, y3, 1, 0, 0, 0],
 	  				[0, 0, 0, x3, y3, 1]])
-		Y = np.array([x1_,y1_,x2_,y2_,x3_,y3_])
-		XA_product = np.dot(self.A,X)
+		Y = np.transpose(np.array([[x1_,y1_,x2_,y2_,x3_,y3_]]))
+		XA_product = np.dot(X, self.A)
 		result = np.subtract(XA_product,Y)
 		total_error = np.sum(np.absolute(result))
 		return total_error
 
 	@staticmethod
-	def final_transform(self,list_index_desc):
+	def final_transform(list_index_desc):
 		list_p = []
 		list_p_ = []
 		for count in range(len(list_index_desc)):
@@ -94,19 +94,19 @@ class AffineTransf:
 			if i%2==0:
 				X[i][3] = X[i][4] = X[i][5] = 0
 				X[i][0] = list_x[i//2]
- 				X[i][1] = list_y[i//2]
- 				X[i][2] = 1
+				X[i][1] = list_y[i//2]
+				X[i][2] = 1
 			else:
 				X[i][0] = X[i][1] = X[i][2] = 0
 				X[i][3] = list_x[i//2]
- 				X[i][4] = list_y[i//2]
- 				X[i][5] = 1
+				X[i][4] = list_y[i//2]
+				X[i][5] = 1
 		#print(X)
 		Xt = X.transpose()
 		product1 = np.dot(Xt,X)
-		inverse1 = np.linalg(product1)
+		inverse1 = np.linalg.inv(product1)
 		product2 = np.dot(Xt,Y)
-		A = np.dot(inverse1,product2)
+		A = np.dot(inverse1,np.transpose(product2))
 		return A			
 
 class ProjectTransf:	
@@ -141,12 +141,12 @@ class ProjectTransf:
 					  	[0, 0, 0, x4, y4, 1, 0, 0, 0],
 						[0, 0, 0, 0, 0, 0, x4, y4, 1]])
 		
-		Y = np.array([x1_,y1_,x2_,y2_,x3_,y3_,x4_,y4_,1])
+		Y = np.transpose(np.array([[x1_,y1_,x2_,y2_,x3_,y3_,x4_,y4_,1]]))
 		Xt = X.transpose()
 		product1 = np.dot(Xt,X)
-		inverse1 = np.linalg(product1)
+		inverse1 = np.linalg.inv(product1)
 		product2 = np.dot(Xt,Y)
-		A = np.dot(inverse1,product2)
+		A = np.dot(inverse1,np.transpose(product2))
 		self.A = A
 
 	def getA(self):
@@ -184,14 +184,14 @@ class ProjectTransf:
 					  	[0, 0, 0, x4, y4, 1, 0, 0, 0],
 						[0, 0, 0, 0, 0, 0, x4, y4, 1]])
 
-		Y = np.array([x1_,y1_,x2_,y2_,x3_,y3_,x4_,y4_,1])
+		Y = np.transpose(np.array([[x1_,y1_,x2_,y2_,x3_,y3_,x4_,y4_,1]]))
 		XA_product = np.dot(self.A,X)
 		result = np.subtract(XA_product,Y)
 		total_error = np.sum(np.absolute(result))
 		return total_error
 
 	@staticmethod
-	def final_transform(self,list_index_desc):
+	def final_transform(list_index_desc):
 		list_p = []
 		list_p_ = []
 		for count in range(len(list_index_desc)):
@@ -221,24 +221,24 @@ class ProjectTransf:
 			if i%3==0: #rows:0,3,6,9,...
 				X[i][3] = X[i][4] = X[i][5] = X[i][6] = X[i][7] = X[i][8] = 0
 				X[i][0] = list_x[i//3]
- 				X[i][1] = list_y[i//3]
- 				X[i][2] = 1
+				X[i][1] = list_y[i//3]
+				X[i][2] = 1
 			elif (i-1)%3==0: #rows:1,4,7,10,...
 				X[i][0] = X[i][1] = X[i][2] = X[i][6] = X[i][7] = X[i][8] = 0
 				X[i][3] = list_x[i//3]
- 				X[i][4] = list_y[i//3]
- 				X[i][5] = 1
+				X[i][4] = list_y[i//3]
+				X[i][5] = 1
 			elif (i-2)%3==0: #rows:2,5,8,11,...
 				X[i][0] = X[i][1] = X[i][2] = X[i][3] = X[i][4] = X[i][5] = 0
 				X[i][6] = list_x[i//3]
- 				X[i][7] = list_y[i//3]
- 				X[i][8] = 1
+				X[i][7] = list_y[i//3]
+				X[i][8] = 1
 		#print(X)
 		Xt = X.transpose()
 		product1 = np.dot(Xt,X)
-		inverse1 = np.linalg(product1)
+		inverse1 = np.linalg.inv(product1)
 		product2 = np.dot(Xt,Y)
-		A = np.dot(inverse1,product2)
+		A = np.dot(inverse1,np.transpose(product2))
 		return A			
 			
 	

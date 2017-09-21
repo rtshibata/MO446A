@@ -77,13 +77,13 @@ class Sift:
 					histogram = self.keypoint_histogram(sub_image)
 					indx = np.argmax(histogram)
 					threshold = histogram[indx]*0.8
-					new_kp = cv2.KeyPoint(i*c, j*c, _size=2*c+1, _angle=indx*10, _response=1, _octave=l-1)
+					new_kp = cv2.KeyPoint(i*c, j*c, _size=2*c+1, _angle=indx*10)
 					new_kp_list.append(new_kp)
 					self.all_keypoints.append(new_kp)
 					other_keys = np.where(histogram>=threshold)
 					for ok in other_keys[0]:
 						if ok != indx:
-							new_kp = cv2.KeyPoint(i*c, j*c, _size=2*c+1, _angle=indx*ok*10, _response=1, _octave=l-1)
+							new_kp = cv2.KeyPoint(i*c, j*c, _size=2*c+1, _angle=indx*ok*10)
 							new_kp_list.append(new_kp)
 							self.all_keypoints.append(new_kp)
 				kps_line.append(new_kp_list) 
