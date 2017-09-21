@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import math
 
+
 class AffineTransf:	
 	def __init__(self, list_3pt_matches):
 		if len(list_3pt_matches) != 6:
@@ -25,8 +26,8 @@ class AffineTransf:
   					  [x3, y3, 1, 0, 0, 0],
   					  [0, 0, 0, x3, y3, 1]])
 		
-		Y = np.transpose(np.array([[x1_,y1_,x2_,y2_,x3_,y3_]]))
-		Xt = X.transpose()
+		Y =  np.transpose(np.array([[x1_,y1_,x2_,y2_,x3_,y3_]]))
+		Xt = np.transpose(X)
 		product1 = np.dot(Xt,X)
 		inverse1 = np.linalg.inv(product1)
 		product2 = np.dot(Xt,Y)

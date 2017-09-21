@@ -17,7 +17,7 @@ def ransac_affine(sift1,sift2,n_ransac, threshold, n_good_model,list_index_desc)
 	maybe_model = []
 	consensus_set = []
 	list3p= []
-	best_error = math.inf
+	best_error = float('inf')
 
 	keypoints1 = sift1.get_keypoints()
 	keypoints2 = sift2.get_keypoints()
@@ -66,9 +66,9 @@ def ransac_affine(sift1,sift2,n_ransac, threshold, n_good_model,list_index_desc)
 	
 		if len(consensus_set) > n_good_model:
 			this_model = maybe_model
-			sample1= randrange(0,len(consensus_set))
-			sample2= randrange(0,len(consensus_set))
-			sample3= randrange(0,len(consensus_set))
+			sample1= random.randrange(0,len(consensus_set))
+			sample2= random.randrange(0,len(consensus_set))
+			sample3= random.randrange(0,len(consensus_set))
 			i1,j1 = consensus_set[sample1]
 			ponto1 = keypoints1[i1].pt
 			ponto1_ = keypoints2[j1].pt
@@ -97,7 +97,7 @@ def ransac_project(sift1,sift2,n_ransac, threshold, n_good_model,list_index_desc
 	maybe_model = []
 	consensus_set = []
 	list4p= []
-	best_error = math.inf
+	best_error = float('inf')
 
 	for count in range(n_ransac):
 		if 4*count >= len(list_index_desc):
@@ -149,10 +149,10 @@ def ransac_project(sift1,sift2,n_ransac, threshold, n_good_model,list_index_desc
 	
 		if len(consensus_set) > n_good_model:
 			this_model = maybe_model
-			sample1= randrange(0,len(consensus_set))
-			sample2= randrange(0,len(consensus_set))
-			sample3= randrange(0,len(consensus_set))
-			sample4= randrange(0,len(consensus_set))
+			sample1= random.randrange(0,len(consensus_set))
+			sample2= random.randrange(0,len(consensus_set))
+			sample3= random.randrange(0,len(consensus_set))
+			sample4= random.randrange(0,len(consensus_set))
 			i1,j1 = consensus_set[sample1]
 			ponto1 = keypoints1[i1].pt
 			ponto1_ = keypoints2[j1].pt
