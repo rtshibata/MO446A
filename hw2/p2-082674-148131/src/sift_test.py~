@@ -7,14 +7,19 @@ import matching as m
 import random
 import transform
 import ransac as ran
+import sys
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 img_orig1 = cv2.imread(dir_path+'/../input/input-p2-3-1-0.jpg', 1)
+
 if img_orig1 is None:
+	print("aki")
 	print("Image not found.")
+
 	sys.exit()
 img1 = cv2.cvtColor(img_orig1, cv2.COLOR_BGR2GRAY)
 if img1 is None:
+	print("aki1")
 	print("Image not found.")
 	sys.exit()
 
@@ -100,13 +105,13 @@ t_semelhanca = n_pixels/2
 list_points = m.find_matches(sift1_desc,sift2_desc,t_semelhanca)
 print("Interest points matching:", list_points)
 
-'''
+
 #RANSAC
 n_ransac = len(list_index_desc)//3 #3 sem criterio
 threshold = 10 #numero sem criterio
 n_good_model =  len(list_index_desc)//2 #mais de 50% ok
 
-<<<<<<< HEAD
+
 A,error,new_list_index_desc = ran.ransac_affine(sift1,sift2,n_ransac, threshold, n_good_model,list_index_desc)
 #A,error,new_list_index_desc = ran.ransac_project(sift1,sift2,n_ransac, threshold, n_good_model,list_index_desc)
 
@@ -114,7 +119,5 @@ A,error,new_list_index_desc = ran.ransac_affine(sift1,sift2,n_ransac, threshold,
 final_A = transform.AffineTransf.final_transform(new_list_index_desc)
 #final_A = transform.ProjectTransf.final_transform(new_list_index_desc)
 
-=======
-transformationA,error,_ = ransac(n_ransac, threshold, n_good_model)
-'''
->>>>>>> e98f7e756ce9cc0efc6a6fa6b0157c63ee24a654
+
+

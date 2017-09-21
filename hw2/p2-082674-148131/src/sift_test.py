@@ -7,11 +7,14 @@ import matching as m
 import random
 import transform
 import ransac as ran
+import sys
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 img_orig1 = cv2.imread(dir_path+'/../input/input-p2-3-1-0.jpg', 1)
+
 if img_orig1 is None:
 	print("Image not found.")
+
 	sys.exit()
 img1 = cv2.cvtColor(img_orig1, cv2.COLOR_BGR2GRAY)
 if img1 is None:
