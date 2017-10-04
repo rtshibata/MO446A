@@ -18,9 +18,13 @@ for i in range(NUN_START, NUN_START+NUM_IMAGES):
 	corner = cv2.cornerHarris(img, 5, 3, 0.01)
 	corner_norm = cv2.normalize(corner, 0, 255)
 	corner_norm_scaled = cv2.convertScaleAbs(corner_norm)
+	corner_norm_scaled = cv2.cvtColor(corner_norm_scaled, cv2.COLOR_GRAY2BGR)
+	n=0
 	for i in range(corner_norm.shape[1]):
 		for j  in range(corner_norm.shape[0]):
 			if corner_norm[j,i] > thresh:
-				cv2.circle(corner_norm_scaled, (i, j), 5,  255)
-	cv2.imwrite(output+str(counter)+'.png', corner_norm_scaled)
+				cv2.circle(img, (i, j), 3,  255)
+				n+=1
+	cv2.imwrite(output+str(counter)+'.png', img)
+	print(n)
 	counter += 1
